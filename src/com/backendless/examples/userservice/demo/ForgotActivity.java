@@ -55,4 +55,6 @@ public class ForgotActivity extends Activity {
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
+
+
 }

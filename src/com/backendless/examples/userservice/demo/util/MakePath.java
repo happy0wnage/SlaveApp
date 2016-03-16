@@ -6,6 +6,7 @@ import android.widget.Toast;
 import com.backendless.BackendlessCollection;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.examples.userservice.demo.Defaults;
+import com.backendless.examples.userservice.demo.FunctionalActivity;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.FileInfo;
 
@@ -30,7 +31,7 @@ public class MakePath implements AsyncCallback<BackendlessCollection<FileInfo>> 
         for (FileInfo info : fileInfo.getData()) {
             String publicURL = info.getPublicUrl();
             if (info.getName().equals(folderName)) {
-                path = publicURL.substring(publicURL.indexOf(Defaults.DEFAULT_PATH_ROOT));
+                path = publicURL.substring(publicURL.indexOf(FunctionalActivity.DEFAULT_PATH_ROOT));
                 Log.e(TAG, "-----------------------" + path);
                 flag = true;
                 break;

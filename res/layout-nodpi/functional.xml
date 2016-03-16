@@ -24,43 +24,33 @@
               android:layout_height="match_parent"
     android:weightSum="1">
 
-    <Button
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:text="Logout"
-            android:id="@+id/logoutButton" android:layout_gravity="center_horizontal"
-        android:textSize="@dimen/normal_text"
-        android:background="#c26c6c"
-        android:textColor="#ffffff" />
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="You can upload image files into the server" android:textSize="@dimen/normal_text"
-        android:layout_marginLeft="@dimen/default_margin"
-            android:layout_marginRight="@dimen/default_margin"
-        android:layout_gravity="center_horizontal"
-        android:id="@+id/filePathField"
-        android:layout_marginTop="10dp" />
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginBottom="5dp"
+        android:weightSum="1">
 
         <Button
-            android:layout_width="150dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Take a photo"
             android:id="@+id/takePhotoButton"
             android:textSize="@dimen/normal_text"
             android:background="#d2ff7f"
-            android:layout_marginRight="0dp"
-            android:layout_marginLeft="5dp"
-            android:layout_column="1" />
+            android:layout_column="1"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
+
+        <Button
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:text="Logout"
+                android:id="@+id/logoutButton" android:layout_gravity="center_horizontal"
+            android:textSize="@dimen/normal_text"
+            android:background="#c26c6c"
+            android:textColor="#ffffff" />
     </LinearLayout>
 
     <LinearLayout
@@ -68,7 +58,43 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp" >
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:background="#e8e8e8"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" >
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Download file"
+            android:id="@+id/downloadFileButton"
+            android:textSize="@dimen/normal_text"
+            android:layout_gravity="center_horizontal"
+            android:background="#a5ff7f"
+            android:layout_column="0"
+            android:clickable="true" />
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/downloadFilePath"
+            android:layout_marginLeft="5dp"
+            android:focusable="true"
+            android:hint="path"
+            android:layout_gravity="bottom" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:background="#e8e8e8"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
 
         <Button
             android:layout_width="150dp"
@@ -82,7 +108,7 @@
             android:clickable="true" />
 
         <EditText
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:id="@+id/uploadFolderText"
             android:layout_marginLeft="5dp"
@@ -96,7 +122,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:background="#e8e8e8"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
 
         <Button
             android:layout_width="150dp"
@@ -108,7 +138,7 @@
             android:clickable="true" />
 
         <EditText
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:id="@+id/browseFolderText"
             android:layout_marginLeft="5dp"
@@ -120,30 +150,50 @@
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp" >
+        android:background="#e8e8e8"
+        android:padding="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp">
 
-        <Button
-            android:layout_width="150dp"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create folder on server"
-            android:id="@+id/createServerFolder"
             android:layout_gravity="center_horizontal"
-            android:background="#adadad"
-            android:clickable="true" />
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp" >
+
+            <Button
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="Share to user"
+                android:id="@+id/shareToUserButton"
+                android:layout_gravity="center_horizontal"
+                android:background="#adadad"
+                android:clickable="true" />
+
+            <EditText
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/shareFilePath"
+                android:layout_gravity="bottom|center_horizontal"
+                android:focusable="true"
+                android:hint="share path"
+                android:layout_marginLeft="5dp" />
+
+        </LinearLayout>
 
         <EditText
-            android:layout_width="150dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/createFolderText"
-            android:layout_gravity="bottom|center_horizontal"
-            android:focusable="true"
-            android:hint="folder name"
-            android:layout_marginLeft="5dp" />
+            android:id="@+id/shareUserEmail"
+            android:hint="user email" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -151,8 +201,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp" >
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:background="#e8e8e8"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
 
         <Button
             android:layout_width="150dp"
@@ -164,7 +218,7 @@
             android:clickable="true" />
 
         <EditText
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:id="@+id/deleteFolderText"
             android:layout_gravity="bottom|center_horizontal"
@@ -176,8 +230,14 @@
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="#e8e8e8"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:id="@+id/fileManegerText"
@@ -186,37 +246,39 @@
             android:textSize="18dp"
             android:gravity="center"
             android:layout_marginTop="10dp"
-            android:text="Browse server files"
+            android:text="Browse sdcard files"
             android:longClickable="true" />
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content" >
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp" >
 
             <EditText
                 android:layout_alignParentLeft="true"
-                android:hint="EditText"
                 android:id="@+id/filePath"
-                android:layout_width="fill_parent"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="15dp"
                 android:ems="10"
                 android:inputType="textPersonName"
-                android:layout_toLeftOf="@+id/fileManegerText" />
+                android:layout_toLeftOf="@+id/fileManegerText"
+                android:layout_gravity="bottom"
+                android:layout_marginRight="5dp" />
 
             <Button
                 android:text="Browser"
                 android:id="@+id/fileManegerText"
                 android:textSize="18dp"
-                android:layout_marginTop="10dp"
                 android:layout_alignParentRight="true"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:onClick="getFile" />
-        </RelativeLayout>
+                android:layout_width="150dp"
+                android:onClick="getFile"
+                android:background="#adadad" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

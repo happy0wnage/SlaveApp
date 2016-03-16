@@ -25,6 +25,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,19 +37,23 @@ import android.widget.Toast;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
+import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.async.callback.BackendlessCallback;
 import com.backendless.examples.userservice.demo.fileexplore.FileChooser;
+import com.backendless.examples.userservice.demo.fileexplore.Pic;
 import com.backendless.examples.userservice.demo.util.FilesUtil;
-import com.backendless.examples.userservice.demo.util.FolderPath;
-import com.backendless.examples.userservice.demo.util.MakePath;
 import com.backendless.examples.userservice.demo.util.Validation;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
 import com.backendless.files.FileInfo;
+import com.backendless.persistence.BackendlessDataQuery;
 
 import java.io.File;
-import java.util.UUID;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
 
 public class FunctionalActivity extends Activity {
 
@@ -62,10 +69,18 @@ public class FunctionalActivity extends Activity {
 
     private EditText edittext;
 
+    public static String DEFAULT_PATH_ROOT;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.functional);
         edittext = (EditText) findViewById(R.id.filePath);
+
+        Button logout = (Button) findViewById(R.id.logoutButton);
+        BackendlessUser user = Backendless.UserService.CurrentUser();
+        DEFAULT_PATH_ROOT = user.getUserId();
+        logout.append(" " + user.getEmail());
+        showToast(DEFAULT_PATH_ROOT);
 
         findViewById(R.id.uploadFileButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,110 +110,258 @@ public class FunctionalActivity extends Activity {
             }
         });
 
-        findViewById(R.id.browseUploadedButton).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.downloadFileButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                EditText downloadFilePath = (EditText) findViewById(R.id.downloadFilePath);
+                if (Validation.validateEditText(downloadFilePath)) {
+                    String path = downloadFilePath.getText().toString();
+                    String whereClause = "url LIKE '%" + DEFAULT_PATH_ROOT + "%" + path + "%'";
+                    Log.e(TAG, "Search query: url LIKE '%" + DEFAULT_PATH_ROOT + "%" + path + "%'");
+                    BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+                    dataQuery.setWhereClause(whereClause);
 
-                EditText browseFolderText = (EditText) findViewById(R.id.browseFolderText);
-                final String folderName = browseFolderText.getText().toString();
-                if (Validation.validateEditText(browseFolderText)) {
-                    Backendless.Files.listing(Defaults.DEFAULT_PATH_ROOT, "*", true, new AsyncCallback<BackendlessCollection<FileInfo>>() {
+                    Backendless.Persistence.of(ImageEntity.class).find(dataQuery, new AsyncCallback<BackendlessCollection<ImageEntity>>() {
                         @Override
-                        public void handleResponse(BackendlessCollection<FileInfo> fileInfo) {
-                            String path = "";
-                            boolean flag = false;
-                            for (FileInfo info : fileInfo.getData()) {
-                                String publicURL = info.getPublicUrl();
-                                if (info.getName().equals(folderName)) {
-                                    path = publicURL.substring(publicURL.indexOf(Defaults.DEFAULT_PATH_ROOT));
-                                    flag = true;
-                                    break;
+                        public void handleResponse(BackendlessCollection<ImageEntity> response) {
+                            final List<ImageEntity> imageEntities = response.getCurrentPage();
+                            if(imageEntities.size() == 0) {
+                                showToast("No file");
+                            }
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    Looper.prepare();
+                                    for (ImageEntity imageEntity : imageEntities) {
+                                        Log.e(TAG, imageEntity.getUrl());
+//                                        Message message = new Message();
+                                        try {
+                                            URL url = new URL(imageEntity.getUrl());
+                                            Log.e(TAG, url.getPath());
+                                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                            connection.setDoInput(true);
+                                            connection.connect();
+                                            InputStream input = connection.getInputStream();
+                                            Pic pic = new Pic(BitmapFactory.decodeStream(input), imageEntity.getName());
+                                            FilesUtil.saveImage(pic);
+                                            showToast("File uploaded: " + (pic).getName());
+//                                            message.obj = pic;
+                                        } catch (Exception e) {
+                                            Log.e(TAG, e.getMessage());
+//                                            message.obj = e;
+                                        }
+//                                        FilesUtil.saveImage((Pic) result);
+//                                        showToast("File uploaded: " + ((Pic) result).getName());
+//                                        imagesHandler.sendMessage(message);
+                                    }
                                 }
-                            }
-                            if (!flag) {
-                                Log.e(TAG, "No such directory");
-                            }
-                            Log.e(TAG, "++++++++++++++++++++++++++++" + path);
-                            Intent intent = new Intent(FunctionalActivity.this, BrowseActivity.class);
-                            intent.putExtra("folder", path);
-                            startActivity(intent);
+                            }.start();
                         }
 
                         @Override
                         public void handleFault(BackendlessFault backendlessFault) {
-                            Log.e(TAG, backendlessFault.getMessage());
-                        }
-                    });
-
-                } else {
-                    Log.e(TAG, "ERROR");
-                    Intent intent = new Intent(FunctionalActivity.this, BrowseActivity.class);
-                    intent.putExtra("folder", "");
-                    startActivity(intent);
-                }
-
-
-            }
-        });
-
-        findViewById(R.id.deleteServerFolder).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final EditText deleteFolderText = (EditText) findViewById(R.id.deleteFolderText);
-                if (Validation.validateEditText(deleteFolderText)) {
-                    Backendless.Files.listing(Defaults.DEFAULT_PATH_ROOT, "*", true, new AsyncCallback<BackendlessCollection<FileInfo>>() {
-                        @Override
-                        public void handleResponse(BackendlessCollection<FileInfo> fileInfo) {
-                            boolean flag = false;
-                            for (FileInfo info : fileInfo.getData()) {
-                                String publicURL = info.getPublicUrl();
-                                if (info.getName().equals(deleteFolderText.getText().toString())) {
-                                    String newPath = publicURL.substring(publicURL.indexOf(Defaults.DEFAULT_PATH_ROOT));
-                                    Log.e(TAG, newPath);
-                                    Backendless.Files.removeDirectory(newPath, new AsyncCallback<Void>() {
-                                        @Override
-                                        public void handleResponse(Void aVoid) {
-                                            showToast("Directory has been deleted");
-                                            Log.e(TAG, "Directory has been deleted");
-                                        }
-
-                                        @Override
-                                        public void handleFault(BackendlessFault backendlessFault) {
-                                            showToast(backendlessFault.getMessage());
-                                            Log.e(TAG, backendlessFault.getMessage());
-                                        }
-                                    });
-                                    flag = true;
-                                    break;
-                                }
-                            }
-                            if (!flag) {
-                                showToast("No such directory");
-                            }
-                        }
-
-                        @Override
-                        public void handleFault(BackendlessFault backendlessFault) {
-                            Log.e(TAG, backendlessFault.getMessage());
                             showToast(backendlessFault.getMessage());
+                            Log.e(TAG, backendlessFault.getMessage());
                         }
                     });
-                } else {
-                    showToast("Select folder");
-                    Log.e(TAG, "Select folder");
                 }
             }
         });
 
-
-        takePhotoButton = (Button) findViewById(R.id.takePhotoButton);
-        takePhotoButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.shareToUserButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, Defaults.CAMERA_REQUEST);
+                final EditText shareFilePath = (EditText) findViewById(R.id.shareFilePath);
+                EditText shareUserEmail = (EditText) findViewById(R.id.shareUserEmail);
+
+                if (!Validation.validateEditText(shareFilePath) || !Validation.validateEditText(shareUserEmail)) {
+                    showToast("Empty field");
+                    return;
+                }
+
+                final String folder = shareFilePath.getText().toString();
+                final String email = shareUserEmail.getText().toString();
+
+                String whereClause = "email LIKE '" + email + "'";
+                BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+                dataQuery.setWhereClause(whereClause);
+                Backendless.Persistence.of(BackendlessUser.class).find(dataQuery, new AsyncCallback<BackendlessCollection<BackendlessUser>>() {
+                    @Override
+                    public void handleResponse(BackendlessCollection<BackendlessUser> response) {
+                        BackendlessUser user = response.getCurrentPage().get(0);
+                        if (user != null) {
+                            final String sharedUserEmail = user.getEmail();
+                            final String id = user.getUserId();
+                            Log.e(TAG, "Email: " + sharedUserEmail + "\t id: " + id);
+
+                            BackendlessDataQuery dataQuery = new BackendlessDataQuery("url LIKE '%" + DEFAULT_PATH_ROOT + "%" + folder + "%'");
+                            Backendless.Persistence.of(ImageEntity.class).find(dataQuery, new AsyncCallback<BackendlessCollection<ImageEntity>>() {
+                                @Override
+                                public void handleResponse(final BackendlessCollection<ImageEntity> response) {
+                                    final List<ImageEntity> imageEntities = response.getCurrentPage();
+                                    showToast(imageEntities.size() + " files");
+                                    if (imageEntities.size() == 0) {
+                                        showToast("No images found");
+                                        return;
+                                    }
+
+                                    new Thread() {
+                                        @Override
+                                        public void run() {
+                                            Looper.prepare();
+                                            for (ImageEntity imageEntity : imageEntities) {
+                                                try {
+                                                    Log.e(TAG, imageEntity.getUrl());
+
+                                                    String fileName = imageEntity.getName() + ".txt";
+                                                    String url = imageEntity.getUrl();
+
+                                                    final UserFile userFile = new UserFile(url, sharedUserEmail, fileName);
+                                                    showToast("URI: " + url + "\tUser email: " + sharedUserEmail);
+
+                                                    File file = FilesUtil.generateFileOnSD(fileName, url);
+                                                    Backendless.Files.upload(file, id + "/" + Defaults.DEFAULT_SHARED, new AsyncCallback<BackendlessFile>() {
+                                                        @Override
+                                                        public void handleResponse(BackendlessFile backendlessFile) {
+                                                            Backendless.Persistence.save(userFile, new AsyncCallback<Object>() {
+                                                                @Override
+                                                                public void handleResponse(Object o) {
+                                                                    showToast("File shared");
+                                                                    Log.e(TAG, "File shared");
+                                                                }
+
+                                                                @Override
+                                                                public void handleFault(BackendlessFault backendlessFault) {
+                                                                    Log.e(TAG, backendlessFault.getMessage());
+                                                                }
+                                                            });
+                                                        }
+
+                                                        @Override
+                                                        public void handleFault(BackendlessFault backendlessFault) {
+                                                            showToast(backendlessFault.getMessage());
+                                                            Log.e(TAG, backendlessFault.getMessage());
+                                                        }
+                                                    });
+                                                } catch (Exception e) {
+                                                    Log.e(TAG, e.getMessage());
+                                                }
+                                            }
+                                        }
+                                    }.start();
+                                }
+
+                                @Override
+                                public void handleFault(BackendlessFault fault) {
+                                    showToast("Make some upload first");
+                                    Log.e(TAG, fault.getMessage());
+                                }
+                            });
+                        } else {
+                            showToast("No such email");
+                        }
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault backendlessFault) {
+                        Log.e(TAG, backendlessFault.getMessage());
+                    }
+                });
+
+
             }
         });
+
+        findViewById(R.id.browseUploadedButton).setOnClickListener(new View.OnClickListener() {
+                                                                       @Override
+                                                                       public void onClick(View view) {
+                                                                           EditText browseFolderText = (EditText) findViewById(R.id.browseFolderText);
+
+                                                                           String folderName = "";
+                                                                           if (Validation.validateEditText(browseFolderText)) {
+                                                                               folderName = browseFolderText.getText().toString();
+                                                                           }
+
+                                                                           Intent intent = new Intent(FunctionalActivity.this, BrowseActivity.class);
+                                                                           intent.putExtra("folder", folderName);
+                                                                           startActivity(intent);
+
+
+                                                                       }
+                                                                   }
+        );
+
+        findViewById(R.id.deleteServerFolder)
+
+                .
+
+                        setOnClickListener(new View.OnClickListener() {
+                                               @Override
+                                               public void onClick(View view) {
+                                                   final EditText deleteFolderText = (EditText) findViewById(R.id.deleteFolderText);
+                                                   if (Validation.validateEditText(deleteFolderText)) {
+                                                       Backendless.Files.listing(DEFAULT_PATH_ROOT, "*", true, new AsyncCallback<BackendlessCollection<FileInfo>>() {
+                                                           @Override
+                                                           public void handleResponse(BackendlessCollection<FileInfo> fileInfo) {
+                                                               boolean flag = false;
+                                                               for (FileInfo info : fileInfo.getData()) {
+                                                                   String publicURL = info.getPublicUrl();
+                                                                   if (info.getName().equals(deleteFolderText.getText().toString())) {
+                                                                       String newPath = publicURL.substring(publicURL.indexOf(DEFAULT_PATH_ROOT));
+                                                                       Log.e(TAG, newPath);
+                                                                       Backendless.Files.removeDirectory(newPath, new AsyncCallback<Void>() {
+                                                                           @Override
+                                                                           public void handleResponse(Void aVoid) {
+                                                                               showToast("Directory has been deleted");
+                                                                               Log.e(TAG, "Directory has been deleted");
+                                                                           }
+
+                                                                           @Override
+                                                                           public void handleFault(BackendlessFault backendlessFault) {
+                                                                               showToast(backendlessFault.getMessage());
+                                                                               Log.e(TAG, backendlessFault.getMessage());
+                                                                           }
+                                                                       });
+                                                                       flag = true;
+                                                                       break;
+                                                                   }
+                                                               }
+                                                               if (!flag) {
+                                                                   showToast("No such directory");
+                                                               }
+                                                           }
+
+                                                           @Override
+                                                           public void handleFault(BackendlessFault backendlessFault) {
+                                                               Log.e(TAG, backendlessFault.getMessage());
+                                                               showToast(backendlessFault.getMessage());
+                                                           }
+                                                       });
+                                                   } else {
+                                                       showToast("Select folder");
+                                                       Log.e(TAG, "Select folder");
+                                                   }
+                                               }
+                                           }
+
+                        );
+
+
+        takePhotoButton = (Button)
+
+                findViewById(R.id.takePhotoButton);
+
+        takePhotoButton.setOnClickListener(new View.OnClickListener()
+
+                                           {
+                                               @Override
+                                               public void onClick(View view) {
+                                                   Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                                                   startActivityForResult(cameraIntent, Defaults.CAMERA_REQUEST);
+                                               }
+                                           }
+
+        );
     }
 
     public void getFile(View view) {
@@ -221,21 +384,15 @@ public class FunctionalActivity extends Activity {
                 Uri uri = data.getData();
                 String path = FilesUtil.getRealPathFromURI(FunctionalActivity.this, uri);
 
-                TextView textView = (TextView) findViewById(R.id.filePathField);
-                File file = new File(path);
+                TextView textView = (TextView) findViewById(R.id.filePath);
+                final File file = new File(path);
                 textView.setText("Uploaded file: " + file.getPath());
 
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                Bitmap bitmap = BitmapFactory.decodeFile(file.getPath(), options);
+                Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
                 if (bitmap == null) {
                     finishActivity(RESULT_CANCELED);
                     return;
                 }
-                /*Drawable drawable = new BitmapDrawable(bitmap);
-                drawable.setAlpha(50);
-*/
-                String name = UUID.randomUUID().toString() + ".png";
 
                 StringBuilder folder = new StringBuilder("/uploaded");
                 EditText uploadFolderName = (EditText) findViewById(R.id.uploadFolderText);
@@ -243,10 +400,10 @@ public class FunctionalActivity extends Activity {
                     folder.append("/").append(uploadFolderName.getText());
                 }
 
-                Backendless.Files.Android.upload(bitmap, Bitmap.CompressFormat.PNG, 10, name, Defaults.DEFAULT_PATH_ROOT + folder, new AsyncCallback<BackendlessFile>() {
+                Backendless.Files.Android.upload(bitmap, Bitmap.CompressFormat.PNG, 100, file.getName(), DEFAULT_PATH_ROOT + folder, new AsyncCallback<BackendlessFile>() {
                     @Override
                     public void handleResponse(BackendlessFile backendlessFile) {
-                        ImageEntity entity = new ImageEntity(System.currentTimeMillis(), backendlessFile.getFileURL());
+                        ImageEntity entity = new ImageEntity(System.currentTimeMillis(), backendlessFile.getFileURL(), file.getName());
                         Log.e(TAG, entity.toString());
 
                         Backendless.Persistence.save(entity, new BackendlessCallback<ImageEntity>() {
@@ -255,7 +412,6 @@ public class FunctionalActivity extends Activity {
                                 Intent data = new Intent();
                                 data.putExtra(Defaults.DATA_TAG, imageEntity.getUrl());
                                 setResult(RESULT_OK, data);
-
                             }
 
                             @Override
@@ -282,6 +438,18 @@ public class FunctionalActivity extends Activity {
                 break;
         }
     }
+
+   /* private Handler imagesHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message message) {
+            Object result = message.obj;
+
+            if (result instanceof Pic)
+                FilesUtil.saveImage((Pic) result);
+            showToast("File uploaded: " + ((Pic) result).getName());
+            return true;
+        }
+    });*/
 
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();

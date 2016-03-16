@@ -23,19 +23,43 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
 import com.backendless.Backendless;
+import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+
+import java.util.List;
 
 public class MainActivity extends Activity
 {
+  private static final String TAG = MainActivity.class.getName();
+
   @Override
   public void onCreate( Bundle savedInstanceState )
   {
     super.onCreate( savedInstanceState );
-    setContentView( R.layout.main );
+    setContentView(R.layout.main);
+
+    /*Backendless.Persistence.of(UserFile.class).find(new AsyncCallback<BackendlessCollection<UserFile>>() {
+      @Override
+      public void handleResponse(BackendlessCollection<UserFile> response) {
+        List<UserFile> userFiles = response.getCurrentPage();
+        Log.e(TAG, "Size: " + userFiles.size());
+        for (UserFile userFile : userFiles) {
+          Backendless.Persistence.of(UserFile.class).remove(userFile);
+        }
+      }
+
+      @Override
+      public void handleFault(BackendlessFault backendlessFault) {
+        Log.e(TAG, backendlessFault.getMessage());
+      }
+    });*/
 
     if( Defaults.APPLICATION_ID.equals( "" ) || Defaults.SECRET_KEY.equals( "" ) || Defaults.VERSION.equals( "" ) )
     {

@@ -29,10 +29,10 @@ public class Defaults {
 
     public static final int CAMERA_REQUEST = 101;
     public static final int URL_REQUEST = 102;
-    private static final int CREATE_SERVER_FOLDER = 103;
-    private static final int DELETE_SERVER_FOLDER = 104;
     public static final String DATA_TAG = "data";
-    public static final String DEFAULT_PATH_ROOT = Backendless.UserService.CurrentUser().getUserId();
-    public static final String DEFAULT_PATH_CAMERA = Backendless.UserService.CurrentUser().getUserId() + "/camera";
+    public static final String FOLDER = "folder";
+    public static final String DEFAULT_PATH_CAMERA = "/camera";
+    public static final String DEFAULT_SHARED = "shared";
+    public static final String DEFAULT_SDCARD_FOLDER = "Download/BackendlessDownloads";
 //    public static final String DEFAULT_PATH_ROOT = "fileservice_sample";
 }

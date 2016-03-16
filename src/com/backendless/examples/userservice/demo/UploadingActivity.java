@@ -25,6 +25,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -44,8 +45,8 @@ public class UploadingActivity extends Activity
   @Override
   public void onCreate( Bundle savedInstanceState )
   {
-    super.onCreate( savedInstanceState );
-    setContentView( R.layout.uploading );
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.uploading);
 
     LinearLayout imageContainer = (LinearLayout) findViewById( R.id.imageContainer );
     Bitmap photo = (Bitmap) getIntent().getExtras().get( Defaults.DATA_TAG );
@@ -59,14 +60,14 @@ public class UploadingActivity extends Activity
     drawable.setAlpha( 50 );
     imageContainer.setBackgroundDrawable( drawable );
 
-    String name = UUID.randomUUID().toString() + ".png";
+    final String name = UUID.randomUUID().toString() + ".png";
 
-    Backendless.Files.Android.upload( photo, Bitmap.CompressFormat.PNG, 100, name, Defaults.DEFAULT_PATH_CAMERA, new AsyncCallback<BackendlessFile>()
+    Backendless.Files.Android.upload( photo, Bitmap.CompressFormat.PNG, 100, name, FunctionalActivity.DEFAULT_PATH_ROOT + Defaults.DEFAULT_PATH_CAMERA, new AsyncCallback<BackendlessFile>()
     {
       @Override
       public void handleResponse( final BackendlessFile backendlessFile )
       {
-        ImageEntity entity = new ImageEntity( System.currentTimeMillis(), backendlessFile.getFileURL() );
+        ImageEntity entity = new ImageEntity( System.currentTimeMillis(), backendlessFile.getFileURL(), name);
         Log.e(TAG, entity.toString());
         Backendless.Persistence.save( entity, new BackendlessCallback<ImageEntity>()
         {

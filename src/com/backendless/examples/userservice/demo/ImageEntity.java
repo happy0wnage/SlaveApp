@@ -21,16 +21,27 @@ package com.backendless.examples.userservice.demo;
 public class ImageEntity
 {
   private long uploaded;
+
   private String url;
+
+  private String name;
 
   public ImageEntity()
   {
   }
 
-  public ImageEntity( long uploaded, String url )
-  {
+  public ImageEntity(long uploaded, String url, String name) {
     this.uploaded = uploaded;
     this.url = url;
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public long getUploaded()
