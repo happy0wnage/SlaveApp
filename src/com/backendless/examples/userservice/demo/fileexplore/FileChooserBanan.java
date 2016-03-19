@@ -64,7 +64,7 @@ public class FileChooserBanan extends ListActivity {
         });
         this.setListAdapter(adapter);
         */
-/*this.setTitle("Current Dir: " + f.getName());
+/*this.setTitle("Current Dir: " + f.getFileName());
         List<Item> dir = new ArrayList<Item>();
         List<Item> fls = new ArrayList<Item>();
         try {
@@ -85,10 +85,10 @@ public class FileChooserBanan extends ListActivity {
                     else num_item = num_item + " items";
 
                     //String formated = lastModDate.toString();
-                    dir.add(new Item(ff.getName(), num_item, date_modify, ff.getAbsolutePath(), "directory_icon"));
+                    dir.add(new Item(ff.getFileName(), num_item, date_modify, ff.getAbsolutePath(), "directory_icon"));
                 } else {
 
-                    fls.add(new Item(ff.getName(), ff.length() + " Byte", date_modify, ff.getAbsolutePath(), "file_icon"));
+                    fls.add(new Item(ff.getFileName(), ff.length() + " Byte", date_modify, ff.getAbsolutePath(), "file_icon"));
                 }
             }
         } catch (Exception e) {
@@ -97,7 +97,7 @@ public class FileChooserBanan extends ListActivity {
         Collections.sort(dir);
         Collections.sort(fls);
         dir.addAll(fls);
-        if (!f.getName().equalsIgnoreCase("sdcard"))
+        if (!f.getFileName().equalsIgnoreCase("sdcard"))
             dir.add(0, new Item("..", "Parent Directory", "", f.getParent(), "directory_up"));
         adapter = new FileArrayAdapter(FileChooserBanan.this, R.layout.file_view, dir);
         this.setListAdapter(adapter);*//*
@@ -121,7 +121,7 @@ public class FileChooserBanan extends ListActivity {
         //Toast.makeText(this, "Folder Clicked: "+ currentDir, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         intent.putExtra("GetPath", currentDir.toString());
-        intent.putExtra("GetFileName", o.getName());
+        intent.putExtra("GetFileName", o.getFileName());
         setResult(RESULT_OK, intent);
         finish();
     }

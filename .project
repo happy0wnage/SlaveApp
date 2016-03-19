@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>UserServiceDemo</name>
+	<fileName>UserServiceDemo</fileName>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>
+			<fileName>com.android.ide.eclipse.adt.ResourceManagerBuilder</fileName>
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.android.ide.eclipse.adt.PreCompilerBuilder</name>
+			<fileName>com.android.ide.eclipse.adt.PreCompilerBuilder</fileName>
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.jdt.core.javabuilder</name>
+			<fileName>org.eclipse.jdt.core.javabuilder</fileName>
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.android.ide.eclipse.adt.ApkBuilder</name>
+			<fileName>com.android.ide.eclipse.adt.ApkBuilder</fileName>
 			<arguments>
 			</arguments>
 		</buildCommand>

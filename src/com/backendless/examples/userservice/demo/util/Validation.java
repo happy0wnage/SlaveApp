@@ -13,6 +13,12 @@ public class Validation {
             return false;
         }
         return true;
+    }
 
+    public static boolean validateString(String text) {
+        if(text == null || text.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }

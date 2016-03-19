@@ -45,22 +45,6 @@ public class MainActivity extends Activity
     super.onCreate( savedInstanceState );
     setContentView(R.layout.main);
 
-    /*Backendless.Persistence.of(UserFile.class).find(new AsyncCallback<BackendlessCollection<UserFile>>() {
-      @Override
-      public void handleResponse(BackendlessCollection<UserFile> response) {
-        List<UserFile> userFiles = response.getCurrentPage();
-        Log.e(TAG, "Size: " + userFiles.size());
-        for (UserFile userFile : userFiles) {
-          Backendless.Persistence.of(UserFile.class).remove(userFile);
-        }
-      }
-
-      @Override
-      public void handleFault(BackendlessFault backendlessFault) {
-        Log.e(TAG, backendlessFault.getMessage());
-      }
-    });*/
-
     if( Defaults.APPLICATION_ID.equals( "" ) || Defaults.SECRET_KEY.equals( "" ) || Defaults.VERSION.equals( "" ) )
     {
       showAlert( this, "Missing application ID and secret key arguments. Login to Backendless Console, select your app and get the ID and key from the Manage > App Settings screen. Copy/paste the values into the Backendless.initApp call" );

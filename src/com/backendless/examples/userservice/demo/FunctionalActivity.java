@@ -25,9 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -79,7 +77,6 @@ public class FunctionalActivity extends Activity {
         Button logout = (Button) findViewById(R.id.logoutButton);
         BackendlessUser user = Backendless.UserService.CurrentUser();
         DEFAULT_PATH_ROOT = user.getUserId();
-        logout.append(" " + user.getEmail());
         showToast(DEFAULT_PATH_ROOT);
 
         findViewById(R.id.uploadFileButton).setOnClickListener(new View.OnClickListener() {
@@ -93,6 +90,14 @@ public class FunctionalActivity extends Activity {
                 } catch (ActivityNotFoundException ex) {
                     showToast("Please install a File Manager.");
                 }
+            }
+        });
+
+        findViewById(R.id.profileButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getBaseContext(), ProfileActivity.class));
+                finish();
             }
         });
 
@@ -125,7 +130,7 @@ public class FunctionalActivity extends Activity {
                         @Override
                         public void handleResponse(BackendlessCollection<ImageEntity> response) {
                             final List<ImageEntity> imageEntities = response.getCurrentPage();
-                            if(imageEntities.size() == 0) {
+                            if (imageEntities.size() == 0) {
                                 showToast("No file");
                             }
                             new Thread() {
@@ -142,7 +147,7 @@ public class FunctionalActivity extends Activity {
                                             connection.setDoInput(true);
                                             connection.connect();
                                             InputStream input = connection.getInputStream();
-                                            Pic pic = new Pic(BitmapFactory.decodeStream(input), imageEntity.getName());
+                                            Pic pic = new Pic(BitmapFactory.decodeStream(input), imageEntity.getName(), url.getPath());
                                             FilesUtil.saveImage(pic);
                                             showToast("File uploaded: " + (pic).getName());
 //                                            message.obj = pic;
@@ -151,7 +156,7 @@ public class FunctionalActivity extends Activity {
 //                                            message.obj = e;
                                         }
 //                                        FilesUtil.saveImage((Pic) result);
-//                                        showToast("File uploaded: " + ((Pic) result).getName());
+//                                        showToast("File uploaded: " + ((Pic) result).getFileName());
 //                                        imagesHandler.sendMessage(message);
                                     }
                                 }
@@ -216,14 +221,14 @@ public class FunctionalActivity extends Activity {
                                                     String fileName = imageEntity.getName() + ".txt";
                                                     String url = imageEntity.getUrl();
 
-                                                    final UserFile userFile = new UserFile(url, sharedUserEmail, fileName);
+                                                    final ShareFile shareFile = new ShareFile(url, sharedUserEmail, fileName);
                                                     showToast("URI: " + url + "\tUser email: " + sharedUserEmail);
 
                                                     File file = FilesUtil.generateFileOnSD(fileName, url);
                                                     Backendless.Files.upload(file, id + "/" + Defaults.DEFAULT_SHARED, new AsyncCallback<BackendlessFile>() {
                                                         @Override
                                                         public void handleResponse(BackendlessFile backendlessFile) {
-                                                            Backendless.Persistence.save(userFile, new AsyncCallback<Object>() {
+                                                            Backendless.Persistence.save(shareFile, new AsyncCallback<Object>() {
                                                                 @Override
                                                                 public void handleResponse(Object o) {
                                                                     showToast("File shared");
@@ -284,6 +289,7 @@ public class FunctionalActivity extends Activity {
 
                                                                            Intent intent = new Intent(FunctionalActivity.this, BrowseActivity.class);
                                                                            intent.putExtra("folder", folderName);
+                                                                           intent.putExtra(Defaults.CODE, 0);
                                                                            startActivity(intent);
 
 
@@ -439,17 +445,6 @@ public class FunctionalActivity extends Activity {
         }
     }
 
-   /* private Handler imagesHandler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message message) {
-            Object result = message.obj;
-
-            if (result instanceof Pic)
-                FilesUtil.saveImage((Pic) result);
-            showToast("File uploaded: " + ((Pic) result).getName());
-            return true;
-        }
-    });*/
 
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();

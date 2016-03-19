@@ -3,29 +3,29 @@ package com.backendless.examples.userservice.demo;
 /**
  * Created by happy on 16.03.2016.
  */
-public class UserFile {
+public class ShareFile {
 
     private String url;
 
     private String email;
 
-    private String name;
+    private String fileName;
 
-    public UserFile() {
+    public ShareFile() {
     }
 
-    public UserFile(String url, String email, String name) {
+    public ShareFile(String url, String email, String fileName) {
         this.url = url;
         this.email = email;
-        this.name = name;
+        this.fileName = fileName;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getUrl() {
@@ -46,7 +46,7 @@ public class UserFile {
 
     @Override
     public String toString() {
-        return "UserFile{" +
+        return "ShareFile{" +
                 "url=" + url +
                 ", email='" + email + '\'' +
                 '}';

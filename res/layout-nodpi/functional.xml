@@ -41,16 +41,30 @@
             android:background="#d2ff7f"
             android:layout_column="1"
             android:paddingLeft="5dp"
-            android:paddingRight="5dp" />
+            android:paddingRight="5dp"
+            android:layout_marginRight="5dp" />
 
         <Button
-                android:layout_width="250dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:id="@+id/profileButton"
+            android:textSize="@dimen/normal_text"
+            android:background="#7fdfff"
+            android:layout_column="1"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_marginRight="5dp" />
+
+        <Button
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Logout"
                 android:id="@+id/logoutButton" android:layout_gravity="center_horizontal"
             android:textSize="@dimen/normal_text"
             android:background="#c26c6c"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:layout_marginRight="5dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -113,7 +127,7 @@
             android:id="@+id/uploadFolderText"
             android:layout_marginLeft="5dp"
             android:focusable="true"
-            android:hint="folder name"
+            android:hint="folder fileName"
             android:layout_gravity="bottom" />
     </LinearLayout>
 
@@ -143,7 +157,7 @@
             android:id="@+id/browseFolderText"
             android:layout_marginLeft="5dp"
             android:focusable="true"
-            android:hint="folder name"
+            android:hint="folder fileName"
             android:inputType="text"
             android:layout_gravity="bottom" />
 
@@ -223,7 +237,7 @@
             android:id="@+id/deleteFolderText"
             android:layout_gravity="bottom|center_horizontal"
             android:focusable="true"
-            android:hint="folder name"
+            android:hint="folder fileName"
             android:layout_marginLeft="5dp"
             android:clickable="true" />
     </LinearLayout>

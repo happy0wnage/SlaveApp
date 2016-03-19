@@ -48,13 +48,14 @@
         <activity android:name=".BrowseActivity"/>
         <activity android:name=".FunctionalActivity"/>
         <activity android:name=".UploadingActivity"/>
+        <activity android:name=".ProfileActivity"/>
 
         <activity
             android:name=".fileexplore.FileexplorerActivity"
             android:label="@string/title_activity_fileexplorer">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
         </intent-filter>
     </activity>
 
