@@ -62,6 +62,10 @@ public class RegisterActivity extends Activity {
                 new DatePickerDialog(RegisterActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                        if(year < 5) {
+                            showToast("User age must be greater than 5");
+                            return;
+                        }
                         dateOfBirth.set(Calendar.YEAR, year);
                         dateOfBirth.set(Calendar.MONTH, monthOfYear);
                         dateOfBirth.set(Calendar.DAY_OF_MONTH, dayOfMonth);

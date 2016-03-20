@@ -6,24 +6,24 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.GridView;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
-import com.backendless.examples.userservice.demo.fileexplore.Pic;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.examples.userservice.demo.util.Constants;
 import com.backendless.examples.userservice.demo.util.Validation;
+import com.backendless.exceptions.BackendlessFault;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -45,41 +45,67 @@ public class ProfileActivity extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(ProfileActivity.this, BrowseActivity.class);
                 intent.putExtra("folder", "");
-                intent.putExtra(Defaults.CODE, Defaults.IMAGE_CODE);
-//                startActivityForResult(intent, Defaults.IMAGE_CODE);
+                intent.putExtra(Defaults.CODE, Defaults.AVATAR_CODE);
                 startActivity(intent);
-//                final String folder = (String) getIntent().getExtras().get(Defaults.FOLDER);
             }
         });
 
-    }
+        findViewById(R.id.toFunctionActivity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, FunctionalActivity.class);
+                startActivity(intent);
+            }
+        });
 
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK) {
-            return;
-        }
+        findViewById(R.id.trackLocationButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, PlacesActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        switch (requestCode) {
-            case Defaults.IMAGE_CODE:
-                final String path = (String) getIntent().getExtras().get(Defaults.URL);
-                try {
-                    URL url = new URL(path);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    Bitmap bitmap = BitmapFactory.decodeStream(input);
-                    ImageView avatar = (ImageView) findViewById(R.id.avatarView);
-                    avatar.setImageBitmap(bitmap);
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
+        findViewById(R.id.updateInfoButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText nameProfileLabel = (EditText) findViewById(R.id.nameProfileLabel);
+                String name = null;
+                if(Validation.validateEditText(nameProfileLabel)) {
+                    name = nameProfileLabel.getText().toString();
                 }
-                break;
-        }
 
-    }*/
+                EditText emailProfileLabel = (EditText) findViewById(R.id.emailProfileLabel);
+                String email = null;
+                if(Validation.validateEditText(emailProfileLabel)) {
+                    email = emailProfileLabel.getText().toString();
+                }
+
+                EditText countryProfileLabel = (EditText) findViewById(R.id.countryProfileLabel);
+                String country = null;
+                if(Validation.validateEditText(countryProfileLabel)) {
+                    country = countryProfileLabel.getText().toString();
+                }
+
+                BackendlessUser user = Backendless.UserService.CurrentUser();
+                user.setProperty(Constants.UserProperty.NAME, name);
+                user.setEmail(email);
+                user.setProperty(Constants.UserProperty.COUNTRY, country);
+
+                Backendless.UserService.update(user, new AsyncCallback<BackendlessUser>() {
+                    @Override
+                    public void handleResponse(BackendlessUser backendlessUser) {
+                        showToast("User updated");
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault backendlessFault) {
+                        showToast(backendlessFault.getMessage());
+                    }
+                });
+            }
+        });
+    }
 
     private void initFields(BackendlessUser user) {
         TextView nameField = (TextView) findViewById(R.id.nameProfileLabel);
@@ -134,18 +160,20 @@ public class ProfileActivity extends Activity {
                 ImageView avatarView = (ImageView) findViewById(R.id.avatarView);
                 int max = findViewById(R.id.inputTags).getHeight();
                 final float scale = getResources().getDisplayMetrics().density;
-                int padding = (int) (scale * 5);
-                max = (int) (scale * 80);
+                max = (int) (scale * 110);
                 avatarView.setImageBitmap((Bitmap) result);
-                avatarView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                avatarView.getLayoutParams().height = max - padding;
-                avatarView.setMaxWidth(max - padding);
-                avatarView.setPadding(padding, padding, padding, padding);
+                avatarView.setScaleType(ImageView.ScaleType.CENTER);
+                avatarView.getLayoutParams().height = max;
+                avatarView.setMaxWidth(max);
                 avatarView.requestLayout();
                 Log.e(TAG, "avatar uploaded");
             }
             return true;
         }
     });
+
+    private void showToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
 
 }

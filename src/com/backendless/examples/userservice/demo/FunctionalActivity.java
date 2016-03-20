@@ -20,9 +20,14 @@ package com.backendless.examples.userservice.demo;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
@@ -40,11 +45,13 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.async.callback.BackendlessCallback;
 import com.backendless.examples.userservice.demo.fileexplore.FileChooser;
 import com.backendless.examples.userservice.demo.fileexplore.Pic;
+import com.backendless.examples.userservice.demo.util.Constants;
 import com.backendless.examples.userservice.demo.util.FilesUtil;
 import com.backendless.examples.userservice.demo.util.Validation;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.files.BackendlessFile;
 import com.backendless.files.FileInfo;
+import com.backendless.geo.GeoPoint;
 import com.backendless.persistence.BackendlessDataQuery;
 
 import java.io.File;
@@ -52,8 +59,17 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
-public class FunctionalActivity extends Activity {
+public class FunctionalActivity extends Activity implements LocationListener {
+
+    private LocationManager locationManager;
+
+    private String provider;
+
+    private Location location;
+
+    private static final int ONE_MINUTE = 1000 * 60;
 
     private static final int PICKFILE_RESULT_CODE = 1;
 
@@ -72,12 +88,54 @@ public class FunctionalActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.functional);
+
+        final BackendlessUser user = Backendless.UserService.CurrentUser();
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        provider = locationManager.getBestProvider(criteria, false);
+
+        new Thread() {
+            @Override
+            public void run() {
+                for (; ; ) {
+                    try {
+                        location = locationManager.getLastKnownLocation(provider);
+                        if (location != null) {
+                            Log.e(TAG, "Provider " + provider + " has been selected.");
+                            Log.e(TAG, "Latitude: " + location.getLatitude() + "\tLongtitude: " + location.getLongitude());
+                            onLocationChanged(location);
+                            GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+
+                            if (geoPoint != null) {
+                                user.setProperty(Constants.UserProperty.MY_LOCATION, geoPoint);
+
+                                Backendless.UserService.update(user, new AsyncCallback<BackendlessUser>() {
+                                    @Override
+                                    public void handleResponse(BackendlessUser backendlessUser) {
+                                        Log.e(TAG, "User geoPoint updated");
+                                    }
+
+                                    @Override
+                                    public void handleFault(BackendlessFault backendlessFault) {
+                                        Log.e(TAG, backendlessFault.getMessage());
+                                    }
+                                });
+                            } else {
+                                Log.e(TAG, "Geo null");
+                            }
+                            sleep(ONE_MINUTE);
+                        }
+                    } catch (InterruptedException e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                }
+            }
+        }.start();
+
         edittext = (EditText) findViewById(R.id.filePath);
 
-        Button logout = (Button) findViewById(R.id.logoutButton);
-        BackendlessUser user = Backendless.UserService.CurrentUser();
         DEFAULT_PATH_ROOT = user.getUserId();
-        showToast(DEFAULT_PATH_ROOT);
 
         findViewById(R.id.uploadFileButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,14 +208,9 @@ public class FunctionalActivity extends Activity {
                                             Pic pic = new Pic(BitmapFactory.decodeStream(input), imageEntity.getName(), url.getPath());
                                             FilesUtil.saveImage(pic);
                                             showToast("File uploaded: " + (pic).getName());
-//                                            message.obj = pic;
                                         } catch (Exception e) {
                                             Log.e(TAG, e.getMessage());
-//                                            message.obj = e;
                                         }
-//                                        FilesUtil.saveImage((Pic) result);
-//                                        showToast("File uploaded: " + ((Pic) result).getFileName());
-//                                        imagesHandler.sendMessage(message);
                                     }
                                 }
                             }.start();
@@ -448,5 +501,50 @@ public class FunctionalActivity extends Activity {
 
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locationManager.requestLocationUpdates(provider, ONE_MINUTE, 10, this);
+        checkEnabled();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(this);
+    }
+
+
+    @Override
+    public void onLocationChanged(Location loc) {
+        location = loc;
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        showToast("Enabled new provider " + provider);
+        checkEnabled();
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        showToast("Disabled provider " + provider);
+        checkEnabled();
+    }
+
+    private void checkEnabled() {
+        Log.e(TAG, "Enabled: "
+                + locationManager
+                .isProviderEnabled(LocationManager.GPS_PROVIDER));
+        Log.e(TAG, "Enabled: "
+                + locationManager
+                .isProviderEnabled(LocationManager.NETWORK_PROVIDER));
     }
 }

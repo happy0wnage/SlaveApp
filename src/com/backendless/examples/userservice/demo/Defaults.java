@@ -29,7 +29,9 @@ public class Defaults {
 
     public static final int CAMERA_REQUEST = 101;
     public static final int URL_REQUEST = 102;
-    public static final int IMAGE_CODE = 1;
+    public static final int AVATAR_CODE = 1;
+    public static final int GEO_CODE = 2;
+
     public static final String CODE = "code";
     public static final String URL = "imageUrl";
     public static final String DATA_TAG = "data";

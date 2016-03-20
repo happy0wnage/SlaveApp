@@ -3,117 +3,162 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
-    android:padding="20dp"
     android:clickable="true">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="5dp"
+        android:weightSum="1" >
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/avatarView"
-            android:background="#5291d9" />
-
-        <LinearLayout
-            android:orientation="vertical"
+        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:id="@+id/inputTags">
+            android:text="Go back"
+            android:id="@+id/toFunctionActivity"
+            android:textSize="@dimen/normal_text"
+            android:background="#5e81a9"
+            android:layout_column="1"
+            android:textColor="#ffffff"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp" />
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_gravity="center_horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Email: "
-                    android:id="@+id/emailLabel"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:textSize="12dp"
-                    android:textStyle="bold"
-                    android:textColor="#5392d9" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/emailProfileLabel"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:textSize="12dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_gravity="center_horizontal" >
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Name:"
-                    android:id="@+id/nameLabel"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:textSize="12dp"
-                    android:textColor="#5392d9"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/nameProfileLabel"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:textSize="12dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:layout_gravity="center_horizontal" >
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Country:"
-                    android:id="@+id/countryLabel"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:textSize="12dp"
-                    android:textStyle="bold"
-                    android:textColor="#5392d9" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/countryProfileLabel"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:textSize="12dp" />
-            </LinearLayout>
-        </LinearLayout>
     </LinearLayout>
 
-    <Button
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Upload avatar"
-        android:id="@+id/uploadAvatarButton"
-        android:background="#5291d9"
-        android:textColor="#ffffff"
-        android:layout_marginTop="10dp" />
+        android:layout_height="match_parent"
+        android:layout_margin="20dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/avatarView"
+                android:background="#5291d9" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/inputTags">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center_horizontal">
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Email: "
+                        android:id="@+id/emailLabel"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:textSize="12dp"
+                        android:textStyle="bold"
+                        android:textColor="#5392d9" />
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/emailProfileLabel"
+                        android:textSize="12dp"
+                        android:layout_gravity="bottom" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center_horizontal" >
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Name:"
+                        android:id="@+id/nameLabel"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:textSize="12dp"
+                        android:textColor="#5392d9"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/nameProfileLabel"
+                        android:textSize="12dp"
+                        android:layout_gravity="bottom" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_horizontal" >
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Country:"
+                        android:id="@+id/countryLabel"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:textSize="12dp"
+                        android:textStyle="bold"
+                        android:textColor="#5392d9" />
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/countryProfileLabel"
+                        android:textSize="12dp"
+                        android:layout_gravity="bottom" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update personal info"
+            android:id="@+id/updateInfoButton"
+            android:background="#52d9d2"
+            android:textColor="#ffffff"
+            android:layout_marginTop="10dp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upload avatar"
+            android:id="@+id/uploadAvatarButton"
+            android:background="#5291d9"
+            android:textColor="#ffffff"
+            android:layout_marginTop="10dp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Track my location"
+            android:id="@+id/trackLocationButton"
+            android:background="#52d988"
+            android:textColor="#ffffff"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
 
 </LinearLayout>

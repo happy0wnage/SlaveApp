@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go back"
+            android:id="@+id/toMyPlace"
+            android:textSize="@dimen/normal_text"
+            android:background="#5e81a9"
+            android:layout_column="1"
+            android:textColor="#ffffff"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/myPlacesList"
+            android:layout_margin="10dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

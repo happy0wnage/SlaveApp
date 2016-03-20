@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="5dp"
+        android:weightSum="1" >
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go back"
+            android:id="@+id/goBackToProfile"
+            android:textSize="@dimen/normal_text"
+            android:background="#5e81a9"
+            android:layout_column="1"
+            android:textColor="#ffffff"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp" />
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My places"
+        android:id="@+id/myPlacesButton"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="#55d7d9"
+        android:textColor="#ffffff" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView2"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#f4f4f4"
+            android:padding="5dp"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp">
+
+                <Button
+                    android:layout_width="130dp"
+                    android:layout_height="50dp"
+                    android:text="New category"
+                    android:id="@+id/newCategoryButton"
+                    android:background="#55d8da"
+                    android:textColor="#ffffff"
+                    android:padding="5dp" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/categoryNameField"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="5dp"
+                    android:hint="category name" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp">
+
+                <Button
+                    android:layout_width="130dp"
+                    android:layout_height="50dp"
+                    android:text="Browse image"
+                    android:id="@+id/browseImageGeoButton"
+                    android:layout_gravity="center_horizontal|right"
+                    android:background="#55d9db"
+                    android:shadowColor="#000000"
+                    android:singleLine="false"
+                    android:clickable="true"
+                    android:textColor="#ffffff"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:enabled="true"
+                    android:focusable="false" />
+
+                <CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="Image available"
+                    android:id="@+id/availableCheckBox"
+                    android:checked="true" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="10dp">
+
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:id="@+id/categorySpinner"
+                    android:layout_gravity="top"
+                    android:spinnerMode="dropdown"
+                    android:layout_marginTop="5dp" />
+
+            </LinearLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/scrollView" >
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:inputType="textMultiLine"
+                    android:ems="10"
+                    android:id="@+id/geoDescriptionText"
+                    android:lines="5"
+                    android:gravity="top"
+                    android:hint="Description" />
+            </ScrollView>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp" >
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="Add place"
+                    android:id="@+id/addGeoButton"
+                    android:layout_gravity="center_horizontal"
+                    android:background="#70dd6d"
+                    android:shadowColor="#000000"
+                    android:singleLine="false"
+                    android:clickable="false"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

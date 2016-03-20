@@ -82,37 +82,42 @@ public class BrowseActivity extends Activity {
                 Pic pic = imageAdapter.getItem(position);
                 final String url = pic.getUrl();
 
-                if (avatarCode == 0) {
-                    FilesUtil.saveImage(pic);
-                    FilesUtil.showToast("File saved to Downloads", view.getContext());
-                } else {
-                    BackendlessUser user = Backendless.UserService.CurrentUser();
-                    user.setProperty(Defaults.UserDefaults.AVATAR_PATH, url);
-                    Backendless.UserService.update(user, new AsyncCallback<BackendlessUser>() {
-                        @Override
-                        public void handleResponse(BackendlessUser backendlessUser) {
-                            showToast("Avatar uploaded.  User: " + backendlessUser.getEmail());
-                            Log.e(TAG, "Avatar uploaded. URL: " + url);
-                            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                            startActivity(intent);
-                        }
+                switch (avatarCode) {
+                    case 0:
+                        FilesUtil.saveImage(pic);
+                        FilesUtil.showToast("File saved to Downloads", view.getContext());
+                        break;
+                    case Defaults.AVATAR_CODE:
+                        BackendlessUser user = Backendless.UserService.CurrentUser();
+                        user.setProperty(Defaults.UserDefaults.AVATAR_PATH, url);
+                        Backendless.UserService.update(user, new AsyncCallback<BackendlessUser>() {
+                            @Override
+                            public void handleResponse(BackendlessUser backendlessUser) {
+                                showToast("Avatar uploaded.  User: " + backendlessUser.getEmail());
+                                Log.e(TAG, "Avatar uploaded. URL: " + url);
+                                Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                                startActivity(intent);
+                            }
 
-                        @Override
-                        public void handleFault(BackendlessFault backendlessFault) {
-                            showToast(backendlessFault.getMessage());
-                            Log.e(TAG, "Error: " + backendlessFault.getMessage());
-                        }
-                    });
-
-
-
+                            @Override
+                            public void handleFault(BackendlessFault backendlessFault) {
+                                showToast(backendlessFault.getMessage());
+                                Log.e(TAG, "Error: " + backendlessFault.getMessage());
+                            }
+                        });
+                        break;
+                    case Defaults.GEO_CODE:
+                        Intent intent = new Intent(getApplicationContext(), PlacesActivity.class);
+                        Log.e(TAG, "Geo image: " + url);
+                        intent.putExtra(Defaults.URL, url);
+                        startActivity(intent);
+                        break;
                 }
             }
         });
 
         showToast("Downloading images...");
 
-        Log.e(TAG, "Avatar code:" + avatarCode);
         final String folder = (String) getIntent().getExtras().get(Defaults.FOLDER);
 
         String whereClause;
