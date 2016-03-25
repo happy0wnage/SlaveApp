@@ -78,24 +78,34 @@ public class PlacesActivity extends Activity {
         findViewById(R.id.addGeoButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final GeoPoint geoPoint;
-                if ((geoPoint = (GeoPoint) Backendless.UserService.CurrentUser().getProperty(Constants.UserProperty.MY_LOCATION)) != null) {
-                    Log.e(TAG, "Latitude: " + geoPoint.getLatitude() + "\tLongtitude: " + geoPoint.getLongitude());
-                } else {
-                    showToast("Turn on the GPS");
-                    return;
+
+                final GeoPoint geoPoint = new GeoPoint();
+                Map<String, GeoPoint> geoPointMap = (Map<String, GeoPoint>) Backendless.UserService.CurrentUser().getProperty(Constants.UserProperty.MY_LOCATION);
+                for (Map.Entry<String, GeoPoint> geo : geoPointMap.entrySet()) {
+                    switch (geo.getKey()) {
+                        case "latitude":
+                            geoPoint.setLatitude(Double.parseDouble(geo.getValue() + ""));
+                            break;
+                        case "longitude":
+                            geoPoint.setLongitude(Double.parseDouble(geo.getValue() + ""));
+                            break;
+
+                    }
                 }
 
                 final BackendlessUser user = Backendless.UserService.CurrentUser();
 
-                Place place = new Place(user.getEmail());
-                place.setGeoPointId();
-                geoPoint.setObjectId(place.getGeoPointId());
+                final Place place = new Place(user.getEmail());
                 EditText editText = (EditText) findViewById(R.id.geoDescriptionText);
 
                 Set<String> hashTag = new HashSet<>();
 
                 String description = String.valueOf(editText.getText());
+                if(!Validation.validateString(description)) {
+                    showToast("Description is empty");
+                    return;
+                }
+
                 Log.e(TAG, "Description: " + description);
                 String[] words = description.split(" ");
                 Log.e(TAG, Arrays.toString(words));
@@ -130,88 +140,124 @@ public class PlacesActivity extends Activity {
 
                 Log.e(TAG, "Place object: " + place);
 
-                Backendless.Persistence.save(place, new AsyncCallback<Place>() {
+                final GeoPoint geo = new GeoPoint(place.getLatitude(), place.getLongitude(), categories, meta);
+                Backendless.Geo.savePoint(geo, new AsyncCallback<GeoPoint>() {
                     @Override
-                    public void handleResponse(Place place) {
-                        showToast("New place uploaded (DataObject)");
+                    public void handleResponse(GeoPoint geoPoint) {
+                        showToast("GeoPoint to user: " + user.getEmail() + " uploaded");
 
-                        GeoPoint geo = new GeoPoint(place.getLatitude(), place.getLongitude(), categories, meta);
-                        Log.e(TAG, "New geopoint: " + geo.toString());
-                        Backendless.Geo.savePoint(geo, new AsyncCallback<GeoPoint>() {
+                        Backendless.Persistence.save(place, new AsyncCallback<Place>() {
                             @Override
-                            public void handleResponse(GeoPoint geoPoint) {
-                                showToast("GeoPoint to user: " + user.getEmail() + " uploaded");
+                            public void handleResponse(Place place) {
+                                showToast("New place uploaded (DataObject)");
+
+                                GeoPoint geo = new GeoPoint(place.getLatitude(), place.getLongitude(), categories, meta);
+                                Log.e(TAG, "New geopoint: " + geo.toString());
+
                             }
 
                             @Override
                             public void handleFault(BackendlessFault backendlessFault) {
                                 Log.e(TAG, backendlessFault.getMessage());
                                 showToast(backendlessFault.getMessage());
+                                Backendless.Geo.removePoint(geo, new AsyncCallback<Void>() {
+                                    @Override
+                                    public void handleResponse(Void aVoid) {
+                                        Log.e(TAG, "Saved geopoint removed");
+                                    }
 
+                                    @Override
+                                    public void handleFault(BackendlessFault backendlessFault) {
+                                        Log.e(TAG, backendlessFault.getMessage());
+                                    }
+                                });
                             }
                         });
+
                     }
 
                     @Override
                     public void handleFault(BackendlessFault backendlessFault) {
                         Log.e(TAG, backendlessFault.getMessage());
                         showToast(backendlessFault.getMessage());
+
                     }
                 });
-            }
-        });
 
-        final Spinner geoUnitsSpinner = (Spinner) findViewById(R.id.categorySpinner);
-
-        Backendless.Geo.getCategories(new DefaultCallback<List<GeoCategory>>(this) {
-            @Override
-            public void handleResponse(List<GeoCategory> response) {
-                geoCategories = response;
-                String[] geoCategoriesStringArray = new String[geoCategories.size()];
-                for (int i = 0; i < geoCategories.size(); i++) {
-                    geoCategoriesStringArray[i] = geoCategories.get(i).getName();
-                }
-                ArrayAdapter<CharSequence> geoUnitsSpinnerAdapter = new ArrayAdapter<CharSequence>(PlacesActivity.this, android.R.layout.simple_spinner_item, geoCategoriesStringArray);
-                geoUnitsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                geoUnitsSpinner.setAdapter(geoUnitsSpinnerAdapter);
-
-                super.handleResponse(response);
-            }
-        });
-
-
-        final Button browseImageGeoButton = (Button) findViewById(R.id.browseImageGeoButton);
-        final CheckBox checkBox = (CheckBox) findViewById(R.id.availableCheckBox);
-        checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkBox.isChecked()) {
-                    browseImageGeoButton.setEnabled(true);
-                } else {
-                    browseImageGeoButton.setEnabled(false);
-                }
-            }
-        });
-
-
-        browseImageGeoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(PlacesActivity.this, BrowseActivity.class);
-                intent.putExtra(Constants.Extra.FOLDER, "");
-                intent.putExtra(Defaults.CODE, Defaults.GEO_CODE);
-                startActivity(intent);
-            }
-        });
-
-        findViewById(R.id.goBackToProfile).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(PlacesActivity.this, ProfileActivity.class);
-                startActivity(intent);
-            }
-        });
+        }
     }
+
+    );
+
+    final Spinner geoUnitsSpinner = (Spinner) findViewById(R.id.categorySpinner);
+
+    Backendless.Geo.getCategories(new DefaultCallback<List<GeoCategory>>(this)
+
+    {
+        @Override
+        public void handleResponse (List < GeoCategory > response) {
+        geoCategories = response;
+        String[] geoCategoriesStringArray = new String[geoCategories.size()];
+        for (int i = 0; i < geoCategories.size(); i++) {
+            geoCategoriesStringArray[i] = geoCategories.get(i).getName();
+        }
+        ArrayAdapter<CharSequence> geoUnitsSpinnerAdapter = new ArrayAdapter<CharSequence>(PlacesActivity.this, android.R.layout.simple_spinner_item, geoCategoriesStringArray);
+        geoUnitsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        geoUnitsSpinner.setAdapter(geoUnitsSpinnerAdapter);
+
+        super.handleResponse(response);
+    }
+    }
+
+    );
+
+
+    final Button browseImageGeoButton = (Button) findViewById(R.id.browseImageGeoButton);
+    final CheckBox checkBox = (CheckBox) findViewById(R.id.availableCheckBox);
+    checkBox.setOnClickListener(new View.OnClickListener()
+
+    {
+        @Override
+        public void onClick (View v){
+        if (checkBox.isChecked()) {
+            browseImageGeoButton.setEnabled(true);
+        } else {
+            browseImageGeoButton.setEnabled(false);
+        }
+    }
+    }
+
+    );
+
+
+    browseImageGeoButton.setOnClickListener(new View.OnClickListener()
+
+    {
+        @Override
+        public void onClick (View v){
+        Intent intent = new Intent(PlacesActivity.this, BrowseActivity.class);
+        intent.putExtra(Constants.Extra.FOLDER, "");
+        intent.putExtra(Defaults.CODE, Defaults.GEO_CODE);
+        startActivity(intent);
+    }
+    }
+
+    );
+
+    findViewById(R.id.goBackToProfile)
+
+    .
+
+    setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick (View v){
+            Intent intent = new Intent(PlacesActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    );
+}
 
     private void showToast(String msg) {
         Toast.makeText(PlacesActivity.this, msg, Toast.LENGTH_SHORT).show();

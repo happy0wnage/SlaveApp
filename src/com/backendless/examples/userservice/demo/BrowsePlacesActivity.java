@@ -88,7 +88,7 @@ public class BrowsePlacesActivity extends Activity {
                 AlertDialog.Builder alert = new AlertDialog.Builder(BrowsePlacesActivity.this);
                 alert.setTitle("Delete?");
                 final Place place = places.get(position);
-                alert.setMessage("Are you sure you want to delete " + place.toStringGeo());
+                alert.setMessage("Are you sure you want to delete " + place.toStringGeo() + "\nDescription: " + place.getDescription());
                 alert.setNegativeButton("Cancel", null);
                 alert.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -108,7 +108,7 @@ public class BrowsePlacesActivity extends Activity {
                                         List<GeoPoint> geoPoints = response.getCurrentPage();
                                         for (GeoPoint geoPoint : geoPoints) {
                                             Log.e(TAG, "Object id: " + geoPoint.getObjectId());
-                                            if (geoPoint.getObjectId().equals(place.getGeoPointId())) {
+                                            if (geoPoint.getObjectId().equals(place.getGeoId())) {
                                                 Backendless.Geo.removePoint(geoPoint, new AsyncCallback<Void>() {
                                                     @Override
                                                     public void handleResponse(Void aVoid) {

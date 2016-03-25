@@ -8,6 +8,8 @@ import java.util.UUID;
  */
 public class Place {
 
+    private String geoId;
+
     private String userEmail;
 
     private String description;
@@ -21,6 +23,14 @@ public class Place {
     private String urlPath;
 
     public Place() {
+    }
+
+    public String getGeoId() {
+        return geoId;
+    }
+
+    public void setGeoId(String geoId) {
+        this.geoId = geoId;
     }
 
     public Place(String userEmail) {

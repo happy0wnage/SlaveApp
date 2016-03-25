@@ -102,6 +102,7 @@ public class FunctionalActivity extends Activity implements LocationListener {
                     try {
                         location = locationManager.getLastKnownLocation(provider);
                         if (location != null) {
+                            Log.e(TAG, "Trying to get position");
                             Log.e(TAG, "Provider " + provider + " has been selected.");
                             Log.e(TAG, "Latitude: " + location.getLatitude() + "\tLongtitude: " + location.getLongitude());
                             onLocationChanged(location);
